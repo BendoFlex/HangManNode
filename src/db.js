@@ -15,11 +15,11 @@ const run = async () => {
 }
 
 run().then(async(res) => {
-    let it = 0;
-    while(it<6 && res.hasNext()){
+    //let it = 0;
+    while(res.hasNext()){
          const {word} = await res.next();
          console.log(word)
-         it++;
+         //it++;
     }
 })
 .catch((e)=>{
