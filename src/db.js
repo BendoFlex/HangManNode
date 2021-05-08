@@ -6,7 +6,12 @@ const run = async () => {
         const database = client.db('game');
         const words = database.collection('pendu')
 
-        return roster = await words.find({})
+        letter_range = "abcdefghijklmnopqrstuv"
+        const rand = Math.floor(Math.random()*(letter_range.length - 1));
+        const letter = letter_range.charAt(rand)
+        console.log(letter)
+        const query = {theme :'law', word : new RegExp("^"+letter, "i")}
+        return roster = await words.find(query).limit(10)
 
     }catch(e){
         console.log(e)
@@ -15,11 +20,11 @@ const run = async () => {
 }
 
 run().then(async(res) => {
-    //let it = 0;
-    while(res.hasNext()){
+    let it = 0;
+    while(it < 9 && res.hasNext()){
          const {word} = await res.next();
          console.log(word)
-         //it++;
+         it++;
     }
 })
 .catch((e)=>{

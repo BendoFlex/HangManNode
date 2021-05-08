@@ -1,5 +1,6 @@
 const fs = require('fs')
 const readline = require('readline');
+const {client} = require('./connect');
 
 var filename = __dirname + '/assets.html';
 
@@ -37,14 +38,22 @@ async function processLineByLine() {
     
 
     const word = String(line.slice(start + 1, start + end + 1));
-    const parsed = word.replace(/&eacute;/g ,"é");//PROCESS REPLACE ALL
+   
+    let parsed = word;
+    if(word.indexOf("&eacute;") != -1 ){
+        parsed = word.replace(/&eacute;/g ,"e");//PROCESS REPLACE ALL
+        
+    }
+    if(word.indexOf("&ecirc;") != -1){
+        parsed = word.replace(/&ecirc;/g ,"e");//PROCESS REPLACE ALL
+    }
 
-    console.log(parsed)
-    console.log(parsed.split(" "))
+  
+    //console.log(parsed.split(" "))
 
-    if((parsed != '' && parsed.split(" ").length == 1) || parsed.indexOf("Ad") != -1){
-        if(parsed.indexOf("Ad") != -1 && parsed.split(" ").length > 2){
-            let parts = parsed.split(" ");
+    if((word != '' && word.split(" ").length == 1) || word.indexOf("Ad") != -1){
+        if(word.indexOf("Ad") != -1 && word.split(" ").length > 2){
+            let parts = word.split(" ");
             list_of_words.push(parts[0]+" "+parts[1]) //PUSH wanted splitted part
         }
         else{
@@ -54,19 +63,48 @@ async function processLineByLine() {
     }
 
   }
-  console.log(list_of_words)
+  return list_of_words;
 }
 
-processLineByLine();
+processLineByLine().then((words) => {
+    try{
+    client.connect();
+   const database = client.db("game");
+   const game = database.collection("pendu")
+
+   game.insertOne({word :"legiferer" ,theme :"law"})
+       /* for (word of words){
+                game.insertOne({word :word ,theme :"law"})
+        }*/
+   
+
+    }
+    catch(e) {
+        console.log(e);
+        client.close();
+    }
+}
+
+)
 
 
-function sanitize (word) { //PROCESS ITERATION PAR CLE
-    let refs = [{"&eacute;" : "é"} , {"&ecirc;" : "è"}]
-    for(pattern of Object.keys(refs)) {
+function sanitize (word) { //PROCESS ITERATION PAR CLE, what is an object?
+    let refs = {
+        "&eacute;" : "é",
+        "&ecirc;" : "è"
+    }
+    let sanitized =""
+   
+    for(patt of Object.keys(refs)) {
+        let pattern = "/"+patt+"/"
+        let re = new RegExp(pattern , "g");
+        
         if(word.indexOf(pattern)!= -1){
-            word.replace(/+pattern+/g , pattern)
+           sanitized = word.replace(/&eacute;/g , refs[pattern])
+           //sanitized = sanitized.replace(/&ecirc;/g , refs[pattern])
         }
         
     }
+    return sanitized;
     
 }
