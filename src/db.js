@@ -1,32 +1,57 @@
-const {client} = require("./connect")
+const {client} = require("./connect");
+const {game} = require('../app');
 
-const run = async () => {
+const getData = async () => {
     try {
         client.connect();
         const database = client.db('game');
         const words = database.collection('pendu')
 
-        letter_range = "abcdefghijklmnopqrstuv"
+        letter_range = "abdefghijlmnopqrstv"
         const rand = Math.floor(Math.random()*(letter_range.length - 1));
         const letter = letter_range.charAt(rand)
         console.log(letter)
-        const query = {theme :'law', word : new RegExp("^"+letter, "i")}
-        return roster = await words.find(query).limit(10)
-
+        const query = {theme :'law', word : new RegExp("^"+letter, "i")} //PROCESS REGEXP with variable
+        return roster = await words.find(query)
+        
     }catch(e){
         console.log(e)
         client.close();
     }
 }
 
-run().then(async(res) => {
-    let it = 0;
-    while(it < 9 && res.hasNext()){
-         const {word} = await res.next();
-         console.log(word)
-         it++;
-    }
+const getWords = async() => {
+
+    const myWords =  getData().then(async(res) => {
+        let it = 0;
+        let words = [];
+        let count = await res.count()
+        //console.log(count)
+        while((it < 8 || it <  count - 1) && res.hasNext()){
+             const {word} = await res.next();
+             //console.log(it)
+            // console.log(word)
+             words.push(word)
+             it++;
+        }
+        //console.log(words)
+        return words;
+    })
+    .catch((e)=>{
+        console.log(e)
+    })
+    //console.log(myWords)
+    return myWords;
+}
+
+
+
+
+
+ getWords().then((res)=>{
+
+    let words = res;
+    game(words);
 })
-.catch((e)=>{
-    console.log(e)
-})
+
+
