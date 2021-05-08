@@ -1,8 +1,8 @@
 
-const game = () => {
+const game = (words) => {
 
 //DB game... collection> pendu 
-let words =[
+/*let words =[
     {"word" :"brelingue"},
     {"word" : "stipuler"},
     {"word" :"baltringue"},
@@ -10,10 +10,11 @@ let words =[
     {"word" : "freluquet"},
     {"word" : "intrinseque"},
     {"word" : "bandouliere"}
-]
-
+]*/
+console.log("in game")
+//console.log(words)
 let rand = Math.floor(Math.random()*7);
-let chosenWord = words[rand].word;
+let chosenWord = words[rand]
 let typedChar = []
 let status = "Progress"
 let found = false;
@@ -45,6 +46,7 @@ process.stdin.on("data" ,(data) => {
     }
     else {
         console.log("STATUS : "+status)
+        console.log("VIE ",MAX_COUNT - counter)
         console.log("type a word :)")
         counter ++;
 
@@ -65,6 +67,7 @@ process.stdin.on("data" ,(data) => {
 
         if(masked == chosenWord){
             found = true;
+            process.stdin.pause()
         }
     
         //console.log(typedChar)
@@ -76,13 +79,16 @@ process.stdin.on("data" ,(data) => {
 function maskWord (word, typed) {
     let splitted = word.split("");
     let masked = []
+    let id = 0
     for(letter of splitted){
-        if(typed.indexOf(letter) == -1){
+        if(typed.indexOf(letter) == -1 && letter != "-" && letter != " " && id != 0){ //si egal à "-" ou " " on mas
             masked.push("*");
         }
         else {
             masked.push(letter)
         }
+        id++;
+        
         
     }
     return masked.join("")
@@ -104,4 +110,6 @@ function isEnd (word) {
 
 }
 
-game();
+module.exports = {
+    game
+}
