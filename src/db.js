@@ -48,10 +48,8 @@ const getWords = async() => {
 
 
 
- getWords().then((res)=>{
-
-    let words = res;
-    game(words);
-})
 
 
+module.exports = {
+    getWords
+}
